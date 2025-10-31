@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pdangwal <pdangwal@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 15:23:21 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/10/24 19:43:10 by pdangwal         ###   ########.fr       */
+/*   Updated: 2025/10/31 17:09:45 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "mini.h"
+#include "minishell.h"
 
 // the kleene star (*) means 0 or more repeitions
 

@@ -3,24 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   lexer_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pdangwal <pdangwal@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 15:23:35 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/10/24 15:23:36 by pdangwal         ###   ########.fr       */
+/*   Updated: 2025/10/31 17:12:54 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "mini.h"
-
-int	ft_strlen(const char *s)
-{
-	int	i;
-
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
-}
+#include "minishell.h"
 
 int	ft_isspace(char c)
 {

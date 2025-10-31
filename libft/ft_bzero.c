@@ -1,30 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sigaction.c                                        :+:      :+:    :+:   */
+/*   ft_bzero.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/21 09:34:06 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/10/31 17:09:43 by kchatela         ###   ########.fr       */
+/*   Created: 2024/11/15 14:39:45 by kchatela          #+#    #+#             */
+/*   Updated: 2024/11/15 15:07:38 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-/*
-int	main(int argc, char *argv[])
+void	ft_bzero(void *s, size_t n)
 {
-	struct sigaction sa;
+	char	*temp;
 
-	sa.sa_handler = &handle_sigtstp;
-	sa.sa_flags = SA_RESTART;
-	sigaction(SIGTSTP, &sa, NULL);
-	while(1)
+	temp = (char *) s;
+	while (n > 0)
 	{
-		printf("stop me\n");
-		sleep(1);
+		*temp = 0;
+		temp++;
+		n--;
 	}
-
 }
-//*/

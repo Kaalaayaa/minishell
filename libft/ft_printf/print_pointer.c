@@ -1,23 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   print_pointer.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pdangwal <pdangwal@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: kchatela <kchatela@student.42berlin.d      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/22 15:56:19 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/10/22 15:57:44 by pdangwal         ###   ########.fr       */
+/*   Created: 2025/01/30 15:06:41 by kchatela          #+#    #+#             */
+/*   Updated: 2025/01/30 15:06:43 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "mini.h"
+#include "ft_printf.h"
 
-int	count_words(char **s)
+int	print_pointer(unsigned long long p)
 {
-	int	i;
+	int	count;
 
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
+	count = 0;
+	if (!p)
+	{
+		ft_putstr_fd("(nil)", 1);
+		return (5);
+	}
+	ft_putstr_fd("0x", 1);
+	count += 2;
+	count += print_low_hex(p);
+	return (count);
 }

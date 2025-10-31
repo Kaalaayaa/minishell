@@ -1,30 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sigaction.c                                        :+:      :+:    :+:   */
+/*   print_char.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kchatela <kchatela@student.42berlin.d      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/21 09:34:06 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/10/31 17:09:43 by kchatela         ###   ########.fr       */
+/*   Created: 2025/01/30 15:07:19 by kchatela          #+#    #+#             */
+/*   Updated: 2025/01/30 15:07:20 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "ft_printf.h"
 
-/*
-int	main(int argc, char *argv[])
+int	print_char(char c)
 {
-	struct sigaction sa;
-
-	sa.sa_handler = &handle_sigtstp;
-	sa.sa_flags = SA_RESTART;
-	sigaction(SIGTSTP, &sa, NULL);
-	while(1)
-	{
-		printf("stop me\n");
-		sleep(1);
-	}
-
+	ft_putchar_fd(c, 1);
+	return (1);
 }
-//*/

@@ -1,5 +1,5 @@
 
-#include "mini.h"
+#include "minishell.h"
 
 void	add_token(t_token **tokens, enum e_type type, char *s)
 {

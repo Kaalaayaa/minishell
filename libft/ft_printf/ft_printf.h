@@ -1,30 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sigaction.c                                        :+:      :+:    :+:   */
+/*   ft_printf.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/21 09:34:06 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/10/31 17:09:43 by kchatela         ###   ########.fr       */
+/*   Created: 2025/01/30 15:06:11 by kchatela          #+#    #+#             */
+/*   Updated: 2025/05/20 18:36:53 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#ifndef FT_PRINTF_H
+# define FT_PRINTF_H
+# include <stdarg.h>
+# include "../libft.h"
 
-/*
-int	main(int argc, char *argv[])
-{
-	struct sigaction sa;
+int	ft_printf(const char *input, ...);
+int	print_string(char *str);
+int	print_char(char c);
+int	print_signed_int(int d);
+int	print_unsigned_int(unsigned int u);
+int	print_up_hex(unsigned long long nb);
+int	print_low_hex(unsigned long long nb);
+int	print_pointer(unsigned long long p);
 
-	sa.sa_handler = &handle_sigtstp;
-	sa.sa_flags = SA_RESTART;
-	sigaction(SIGTSTP, &sa, NULL);
-	while(1)
-	{
-		printf("stop me\n");
-		sleep(1);
-	}
-
-}
-//*/
+#endif

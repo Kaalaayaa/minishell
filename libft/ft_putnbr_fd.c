@@ -1,30 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sigaction.c                                        :+:      :+:    :+:   */
+/*   ft_putnbr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/21 09:34:06 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/10/31 17:09:43 by kchatela         ###   ########.fr       */
+/*   Created: 2024/11/28 16:54:22 by kchatela          #+#    #+#             */
+/*   Updated: 2024/12/02 15:45:51 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-/*
-int	main(int argc, char *argv[])
+void	ft_putnbr_fd(int n, int fd)
 {
-	struct sigaction sa;
-
-	sa.sa_handler = &handle_sigtstp;
-	sa.sa_flags = SA_RESTART;
-	sigaction(SIGTSTP, &sa, NULL);
-	while(1)
+	if (n == -2147483648)
 	{
-		printf("stop me\n");
-		sleep(1);
+		write(fd, "-2147483648", 11);
+		return ;
 	}
-
+	if (n < 0)
+	{
+		ft_putchar_fd('-', fd);
+		n = -n;
+	}
+	if (n >= 10)
+	{
+		ft_putnbr_fd((n / 10), fd);
+	}
+	n = n % 10;
+	ft_putchar_fd((n + '0'), fd);
+	return ;
 }
-//*/
+
+/*int main(void)
+{
+	ft_putnbr_fd(589725, 1);
+}*/
