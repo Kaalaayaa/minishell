@@ -98,8 +98,6 @@ char	*get_path(char *argv, t_shell *shell)
 		tmp = ft_strjoin(paths[i], "/");
 		
 		fullpath = ft_strjoin(tmp, argv);
-
-		printf("%s\n", fullpath);
 		free(tmp);
 		if (access(fullpath, X_OK) == 0)
 		{
