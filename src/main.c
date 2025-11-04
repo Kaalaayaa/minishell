@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 15:19:27 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/10/31 17:48:22 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/11/04 16:07:19 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ int main(int argc, char **argv, char **envp)
 
     shell.env_list = env_list_init(envp);
 	shell.exit_status = 0;
+    update_shlvl(&shell);
 
     while (1)
     {

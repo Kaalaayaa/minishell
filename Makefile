@@ -1,6 +1,6 @@
 NAME = minishell
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -Iincludes -g
+CFLAGS = -Wall -Wextra -Werror -Iincludes -g 
 
 # Source files
 SRCS = src/main.c  src/lexer/lexing.c src/lexer/lexer_utils.c \
@@ -8,7 +8,7 @@ SRCS = src/main.c  src/lexer/lexing.c src/lexer/lexer_utils.c \
 	   src/builtins/builtins.c src/builtins/cd.c src/builtins/echo.c src/builtins/utils.c \
 	   src/builtins/env.c src/builtins/exit.c src/builtins/export.c src/builtins/export_utils.c \
 	   src/builtins/pwd.c src/builtins/unset.c \
-	   src/env/env.c \
+	   src/env/env.c src/env/update_shlvl.c \
 	   src/utils/utils.c src/execution/exec.c src/execution/exec_utils.c
 
 
