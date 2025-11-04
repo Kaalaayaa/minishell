@@ -6,61 +6,50 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 11:07:43 by kchatela          #+#    #+#             */
-/*   Updated: 2024/11/29 15:19:52 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/11/04 16:13:11 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int	int_len(int n)
-{
-	int	count;
+#include "libft.h"
 
-	count = 0;
-	if (n < 0)
+static int	num_len(int n)
+{
+	int	len;
+
+	len = (n <= 0);
+	while (n)
 	{
-		count++;
-		n = -n;
+		n /= 10;
+		len++;
 	}
-	while (n > 0)
-	{
-		count++;
-		n = n / 10;
-	}
-	return (count);
+	return (len);
 }
 
 char	*ft_itoa(int n)
 {
-	char	*result;
+	char	*str;
+	long	nb;
 	int		len;
 
-	len = int_len(n);
-	if (n == 0)
-		return (ft_strdup("0"));
-	if (n == -2147483648)
-		return (ft_strdup("-2147483648"));
-	result = malloc((len + 1) * sizeof(char));
-	if (!result)
+	nb = n;
+	len = num_len(n);
+	str = (char *)malloc(sizeof(char) * (len + 1));
+	if (!str)
 		return (NULL);
-	result[len] = '\0';
-	len--;
-	if (n < 0)
+	str[len] = '\0';
+	if (nb == 0)
+		str[0] = '0';
+	if (nb < 0)
 	{
-		result[0] = '-';
-		n = -n;
+		str[0] = '-';
+		nb = -nb;
 	}
-	while (n > 0)
+	while (nb > 0)
 	{
-		result[len] = (n % 10) + '0';
-		n = n / 10;
-		len--;
+		str[--len] = (nb % 10) + '0';
+		nb /= 10;
 	}
-	return (result);
+	return (str);
 }
-
-/*#include <stdio.h>
-int	main(void)
-{
-	printf("%s", ft_itoa(789));
-}*/
