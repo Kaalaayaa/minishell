@@ -9,7 +9,7 @@ SRCS = src/main.c  src/lexer/lexing.c src/lexer/lexer_utils.c \
 	   src/builtins/env.c src/builtins/exit.c src/builtins/export.c src/builtins/export_utils.c \
 	   src/builtins/pwd.c src/builtins/unset.c \
 	   src/env/env.c \
-	   src/utils/utils.c
+	   src/utils/utils.c src/execution/exec.c src/execution/exec_utils.c
 
 
 # Object files

@@ -12,6 +12,64 @@
 
 #include "minishell.h"
 
+
+char    *ft_strncpy(char *src, char c)
+{
+    int i;
+    char *ret;
+
+    ret = NULL;
+    i = 0;
+    if (src[0] == '\'')
+        return (ret);
+    else if (src[0] == '"')
+        src++;
+    while(src[i] && src[i] != c)
+        i++;
+    ret = malloc(sizeof(char) * (i + 1));
+    i = 0;
+    while(src[i] && src[i] != c)
+    {
+        ret[i] = src[i];
+        i++;
+    }
+    ret[i] = '\0';
+    return (ret);
+}
+
+char *extract_line(t_shell *shell, char *s)
+{
+    t_env *list;
+
+
+    list = shell->env_list;
+    if (!shell || !s)
+        return (NULL);
+
+    while(list)
+    {
+        if (ft_strnstr(s, list->key, ft_strlen(s)) != NULL)
+            return (ft_strjoin(ft_strncpy(s, '$'), ft_strdup(list->value)));
+        list = list->next;
+    }
+    return (s);
+}
+
+t_token *expander(t_token *tokens, t_shell *shell)
+{
+    t_token *ret;
+
+    if (!tokens)
+        return NULL;
+    ret = tokens;
+    while(tokens)
+    {
+        if (ft_strchr(tokens->token, '$') != NULL)
+            tokens->token = extract_line(shell, tokens->token);
+        tokens = tokens->next;
+    }
+    return (ret);
+}
 int main(int argc, char **argv, char **envp)
 {
     (void)argc;
@@ -33,15 +91,11 @@ int main(int argc, char **argv, char **envp)
             add_history(line);
 
 		tokens = lexer(line);
+        tokens = expander(tokens, &shell);
 		root = parse_e(&tokens);
 		print_tree(root, 0);
-		
-		//execute_ast(root, &shell);
-		
-        if(is_builtin(root->argv[0]))
-            execute_builtin(root->argv, &shell);
-        else
-            //execute_external(root->argv, &shell);
+        
+        exec_tree(root, &shell);
 			
         free(line);
     }

@@ -125,4 +125,12 @@ int			env_size(t_env *env);
 
 t_env		*env_list_init(char **envp);
 
+
+/* ************************** */
+/*	    EXECUION	      */
+/* ************************** */
+
+void	exec_tree(t_tree *tree, t_shell *shell);
+void    ft_trim_end(char *arr, char c);
+
 #endif

@@ -59,12 +59,15 @@ char	**parse_simple_command(t_token *tokens)
 	}
 	argv = malloc(sizeof(char *) * (i + 1));
 	i = 0;
+	
 	while (tokens && tokens->type == WORD)
 	{
+		
 		argv[i] = ft_strdup(tokens->token);
 		i++;
 		tokens = tokens->next;
 	}
+	
 	argv[i] = NULL;
 	return (argv);
 }
