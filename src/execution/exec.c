@@ -6,14 +6,17 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 	int	fd[2];
 	pid_t	left_pid;
 	pid_t	right_pid;
+	int		status;
 
 	if (!tree || !shell)
 		return ;
 	if (pipe(fd) == -1)
 		return ;
+
 	left_pid = fork();
 	if (left_pid == 0)
 	{
+		setup_signals_child();
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[0]);
 		close(fd[1]);
@@ -23,6 +26,7 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 	right_pid = fork();
 	if (right_pid == 0)
 	{
+		setup_signals_child();
 		dup2(fd[0], STDIN_FILENO);
 		close(fd[0]);
 		close(fd[1]);
@@ -31,8 +35,15 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 	}
 	close(fd[0]);
 	close(fd[1]);
+	setup_signals_parent();
 	waitpid(left_pid, NULL, 0);
-	waitpid(right_pid, NULL, 0);
+	waitpid(right_pid, &status, 0);
+	if (WIFEXITED(status))
+		shell->exit_status = WEXITSTATUS(status);	
+	else if (WIFSIGNALED(status))
+		shell->exit_status = 128 + WTERMSIG(status);
+
+	setup_signals_prompt();
 }
 
 char	*get_path_env(t_shell *shell)
@@ -111,10 +122,12 @@ char	*get_path(char *argv, t_shell *shell)
 	return (NULL);
 	
 }
+
 void	exec_cmd(t_tree *tree, t_shell *shell)
 {
 	pid_t	pid;
 	char	*path;
+	int		status;
 
 	if (!tree)
 		return ;
@@ -126,8 +139,8 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 		pid = fork();
 		if (pid == 0) // child process
 		{
+			setup_signals_child();
 			path = get_path(tree->argv[0], shell);
-			
 			
 			if (!path)
 			{
@@ -136,8 +149,23 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 			}
 			execve(path, tree->argv, NULL); // the null here needs to be char**envp
 		}
-		else
-			waitpid(pid, NULL, 0);
+		else if (pid > 0)
+		{
+			setup_signals_parent();
+			waitpid(pid, &status, 0);
+			setup_signals_prompt();
+			if (WIFEXITED(status)) // killed normally 
+				shell->exit_status = WEXITSTATUS(status); 
+			else if (WIFSIGNALED(status)) // killed by signal
+			{
+				int	sig = WTERMSIG(status); // get signal number
+				shell->exit_status = 128 + sig;
+				if (sig == SIGQUIT)
+					printf("Quit (core dumped)\n");
+				else if (sig == SIGINT)
+					printf("\n");
+			}
+		}
 	}
 }
 
