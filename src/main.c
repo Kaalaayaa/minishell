@@ -6,12 +6,11 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 15:19:27 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/04 16:07:19 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/11/06 17:03:58 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
 
 char    *ft_strncpy(char *src, char c)
 {
@@ -81,15 +80,24 @@ int main(int argc, char **argv, char **envp)
 	t_token *tokens;
 	t_tree *root;
 
-    shell.env_list = env_list_init(envp);
-	shell.exit_status = 0;
-    update_shlvl(&shell);
+    shell_init(&shell, envp);
 
     while (1)
     {
         line = readline("minishell% ");
+        if(!line)
+        {
+            printf("exit\n");
+            break ;
+        }
         if (line[0] != '\0')
             add_history(line);
+        
+        if (g_signal_status == 1)
+		{
+			shell.exit_status = 130;
+			g_signal_status = 0;
+		}
 
 		tokens = lexer(line);
         tokens = expander(tokens, &shell);

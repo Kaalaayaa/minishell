@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 09:34:36 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/04 16:10:36 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/11/04 19:06:12 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,9 @@
 # include <unistd.h>
 # include <stdbool.h>
 # include <limits.h>
+# include <termios.h>
+
+extern volatile sig_atomic_t g_signal_status;
 
 
 /* ************************** */
@@ -112,7 +115,7 @@ int			builtin_cd(char **argv, t_shell *shell);
 /* ************************** */
 /*             UTILS           */
 /* ************************** */
-
+void		shell_init(t_shell *shell, char **envp);
 int			is_valid_identifier(char *key);
 int			ft_strcmp(const char *s1, const char *s2); // ADD to LIBFT !!!
 void		add_or_update_env(t_env **env, char *key, char *value);
@@ -127,12 +130,19 @@ char		*get_env_value(t_env *env, const char *key);
 t_env		*env_list_init(char **envp);
 void		update_shlvl(t_shell *shell);
 
-
 /* ************************** */
 /*	    EXECUION	      */
 /* ************************** */
 
 void	exec_tree(t_tree *tree, t_shell *shell);
 void    ft_trim_end(char *arr, char c);
+
+/* ************************** */
+/*	    SIGNALS      	      */
+/* ************************** */
+
+void setup_signals_prompt(void);
+void	setup_signals_child(void);
+void    setup_signals_parent(void);
 
 #endif
