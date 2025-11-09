@@ -44,13 +44,11 @@ int	word_handle(const char *s, t_token **token)
 		else
 			i++;
 	}
-	
 	d = malloc(sizeof(char) * (i + 1));
 	ft_strlcpy(d, s, i);
 	add_token(token, WORD, d);
 	return (i);
 }
-// when qoutes are present then it should ignore spaces
 
 char	*adjust_input(char *i, t_token **tokens, enum e_type type, char *s)
 {
@@ -59,13 +57,13 @@ char	*adjust_input(char *i, t_token **tokens, enum e_type type, char *s)
 	return (i);
 }
 
-
-
 t_token	*lexer(char *input)
 {
 	t_token	*tokens;
+	char	*tmp;
 
 	tokens = NULL;
+	tmp = input;
 	while (*input)
 	{
 		if (ft_isspace(*input))
@@ -83,7 +81,7 @@ t_token	*lexer(char *input)
 		else
 			input += word_handle(input, &tokens);
 	}
-	
+	free(tmp);
 	return (tokens);
 }
 /*

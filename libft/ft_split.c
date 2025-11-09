@@ -51,11 +51,11 @@ static char	*get_word(const char **s, char c)
 		len++;
 	if (len == 0)
 		return (NULL);
-	word = (char *)malloc(len + 1);
+	word = (char *)malloc(sizeof(char) * (len + 1));
 	if (!word)
 		return (NULL);
-	ft_strlcpy(word, &(*s)[i], len + 1);
-	*s = &(*s)[i + len];
+	ft_strlcpy(word, s[i], len + 1);
+	*s = s[i + len];
 	return (word);
 }
 

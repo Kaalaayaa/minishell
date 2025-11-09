@@ -55,18 +55,16 @@ char	*get_heredoc(char *file)
 		line = readline("> ");
 		if (ft_strcmp(line, file) == 0)
 		{
-            ft_strtrim(new, "\n");
 			free(line);
 			break;
 		}
-    
         new = ft_strjoin(new, ft_strdup("\n"));
         new = ft_strjoin(new, ft_strdup(line));
+        
 		i+= ft_strlen(line) + 1;
         free(line);
-		
 	}
-    //printf("my new: %s\n", new);
+    ft_strtrim(new, "\n");
     return (new);
 }
 

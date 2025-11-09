@@ -107,6 +107,7 @@ int			is_operator_start(char c);
 void		print_tree(t_tree *node, int depth);
 t_tree		*parse_e(t_token **tokens);
 t_redir *apply_redirections(char **argv);
+char	*get_path(char *argv, t_shell *shell);
 
 /* ************************** */
 /*           BUILTINS          */
@@ -147,6 +148,14 @@ void		update_shlvl(t_shell *shell);
 
 void	exec_tree(t_tree *tree, t_shell *shell);
 void    ft_trim_end(char *arr, char c);
+
+/* ************************** */
+/*         REDIRECTION        */
+/* ************************** */
+
+void	redir_output(char *filename);
+void	redir_append(char *filename);
+void	redir_input(char *filename);
 
 /* ************************** */
 /*	    SIGNALS      	      */

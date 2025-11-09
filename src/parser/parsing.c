@@ -87,6 +87,8 @@ t_tree	*parse_e(t_token **tokens)
 	t_tree	*right;
 	t_tree	*pipe_node;
 
+	if (!*tokens)
+		return (NULL);
 	left = init_tree(WORD);
 	left->argv = parse_simple_command(*tokens);
 	left->redirections = apply_redirections(left->argv);
