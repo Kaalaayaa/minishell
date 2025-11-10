@@ -54,7 +54,6 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 
 	if (!tree)
 		return ;
-	
 	if (is_builtin(tree->argv[0]))
 		execute_builtin(tree->argv, shell);
 	else
@@ -64,7 +63,6 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 		{
 			setup_signals_child();
 			path = get_path(tree->argv[0], shell);
-			
 			if (!path)
 			{
 				perror("command not foudn");
