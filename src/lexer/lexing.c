@@ -49,7 +49,6 @@ int	word_handle(const char *s, t_token **token)
 	add_token(token, WORD, d);
 	return (i);
 }
-// when qoutes are present then it should ignore spaces
 
 char	*adjust_input(char *i, t_token **tokens, enum e_type type, char *s)
 {
@@ -61,8 +60,10 @@ char	*adjust_input(char *i, t_token **tokens, enum e_type type, char *s)
 t_token	*lexer(char *input)
 {
 	t_token	*tokens;
+	char	*tmp;
 
 	tokens = NULL;
+	tmp = input;
 	while (*input)
 	{
 		if (ft_isspace(*input))
@@ -70,16 +71,17 @@ t_token	*lexer(char *input)
 		else if (*input == '|')
 			input = adjust_input(input, &tokens, PIPE, "|");
 		else if (*input == '>' && *(input + 1) == '>')
-			input = adjust_input(input, &tokens, DGREAT, ">>");
+			input = adjust_input(input, &tokens, WORD, ">>");
 		else if (*input == '>')
-			input = adjust_input(input, &tokens, GREAT, ">");
+			input = adjust_input(input, &tokens, WORD, ">");
 		else if (*input == '<' && *(input + 1) == '<')
-			input = adjust_input(input, &tokens, DLESS, "<<");
+			input = adjust_input(input, &tokens, WORD, "<<");
 		else if (*input == '<')
-			input = adjust_input(input, &tokens, LESS, "<");
+			input = adjust_input(input, &tokens, WORD, "<");
 		else
 			input += word_handle(input, &tokens);
 	}
+	free(tmp);
 	return (tokens);
 }
 /*

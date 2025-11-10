@@ -29,6 +29,7 @@
 # include <stdbool.h>
 # include <limits.h>
 # include <termios.h>
+# include <fcntl.h>
 
 extern volatile sig_atomic_t g_signal_status;
 
@@ -41,10 +42,10 @@ typedef enum e_type
 {
 	WORD,
 	PIPE,
-	GREAT,
-	DGREAT,
-	LESS,
-	DLESS,
+	REDIR_IN,
+	REDIR_OUT,
+	REDIR_APPEND,
+	REDIR_HEREDOC,
 	END
 }			t_type;
 
@@ -59,9 +60,17 @@ typedef struct s_token
 	struct s_token	*next;
 }			t_token;
 
+typedef struct s_redir
+{
+	t_type	type;
+	char *filename;
+	struct s_redir *next;
+}	t_redir;
+
 typedef struct s_tree
 {
 	t_type			type;
+	t_redir			*redirections;
 	char			*token;
 	char			**argv;
 	struct s_tree	*right;
@@ -81,68 +90,88 @@ typedef struct s_shell
 	int				exit_status;
 }			t_shell;
 
-/* ************************** */
-/*       LEXER / TOKENIZER     */
-/* ************************** */
-
-t_token		*lexer(char *input);
-int			ft_isspace(char c);
-char		*ft_strdup(const char *s);
-size_t		ft_strlcpy(char *dest, const char *src, size_t size);
-int			is_operator_start(char c);
 
 /* ************************** */
-/*           PARSING           */
+/*         REDIRECTION        */
 /* ************************** */
 
-void		print_tree(t_tree *node, int depth);
-t_tree		*parse_e(t_token **tokens);
+void	redir_output(char *filename);
+void	redir_append(char *filename);
+void	redir_input(char *filename);
+t_redir *apply_redirections(char **argv);
+
+void	shell_init(t_shell *shell, char **envp);
 
 /* ************************** */
-/*           BUILTINS          */
+/*          LEXER              */
 /* ************************** */
 
-void		execute_builtin(char **cmd, t_shell *shell);
-bool		is_builtin(const char *cmd);
-int			builtin_echo(char **argv);
-int			builtin_pwd(void);
-int			builtin_env(t_shell *shell);
-int			builtin_exit(char **argv, t_shell *shell);
-int			builtin_export(char **argv, t_shell *shell);
-int			builtin_unset(char **argv, t_shell *shell);
-int			builtin_cd(char **argv, t_shell *shell);
+t_token	*lexer(char *input);
+int		ft_isspace(char c);
+int		is_operator_start(char c);
 
 /* ************************** */
-/*             UTILS           */
-/* ************************** */
-void		shell_init(t_shell *shell, char **envp);
-int			is_valid_identifier(char *key);
-int			ft_strcmp(const char *s1, const char *s2); // ADD to LIBFT !!!
-void		add_or_update_env(t_env **env, char *key, char *value);
-char		*env_to_str(t_env *env);
-void		ft_sort_str_tab(char **tab);
-int			env_size(t_env *env);
-char		*get_env_value(t_env *env, const char *key);
-/* ************************** */
-/*        ENV                 */
+/*          PARSER             */
 /* ************************** */
 
-t_env		*env_list_init(char **envp);
-void		update_shlvl(t_shell *shell);
+t_tree	*parse_e(t_token **tokens);
+void	print_tree(t_tree *node, int depth);
 
 /* ************************** */
-/*	    EXECUION	      */
+/*         EXPANDER            */
+/* ************************** */
+
+t_token	*expander(t_token *tokens, t_shell *shell);
+char	*expand_env(const char *s, t_shell *shell);
+char	*extract_env_key(char *s);
+void	append_and_free(char **res, const char *add);
+void	append_env_value(char **res, char *value);
+char	*ft_strjoin_free(char *s1, char *s2, int flag);
+
+/* ************************** */
+/*          BUILTINS           */
+/* ************************** */
+
+bool	is_builtin(const char *cmd);
+void	execute_builtin(char **cmd, t_shell *shell);
+int		builtin_echo(char **argv);
+int		builtin_pwd(void);
+int		builtin_env(t_shell *shell);
+int		builtin_exit(char **argv, t_shell *shell);
+int		builtin_export(char **argv, t_shell *shell);
+int		builtin_unset(char **argv, t_shell *shell);
+int		builtin_cd(char **argv, t_shell *shell);
+
+/* ************************** */
+/*         ENVIRONMENT          */
+/* ************************** */
+
+t_env	*env_list_init(char **envp);
+char	*get_env_value(t_env *env, const char *key);
+void	add_or_update_env(t_env **env, char *key, char *value);
+void	update_shlvl(t_shell *shell);
+int		is_valid_identifier(char *key);
+int		env_size(t_env *env);
+void	ft_sort_str_tab(char **tab);
+char	*env_to_str(t_env *env);
+
+/* ************************** */
+/*         EXECUTION            */
 /* ************************** */
 
 void	exec_tree(t_tree *tree, t_shell *shell);
-void    ft_trim_end(char *arr, char c);
+void	ft_trim_end(char *arr, char c);
+char	*get_path(char *argv, t_shell *shell);
 
 /* ************************** */
-/*	    SIGNALS      	      */
+/*          SIGNALS             */
 /* ************************** */
 
-void setup_signals_prompt(void);
+void	setup_signals_prompt(void);
 void	setup_signals_child(void);
-void    setup_signals_parent(void);
+void	setup_signals_parent(void);
+
+
+int		ft_strcmp(const char *s1, const char *s2);// TO ADD TO LIBFT
 
 #endif

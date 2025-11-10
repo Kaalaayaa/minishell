@@ -42,86 +42,9 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 		shell->exit_status = WEXITSTATUS(status);	
 	else if (WIFSIGNALED(status))
 		shell->exit_status = 128 + WTERMSIG(status);
-
 	setup_signals_prompt();
 }
 
-char	*get_path_env(t_shell *shell)
-{
-	t_env *env;
-
-	env = shell->env_list;
-	while(env->key)
-	{
-		if (ft_strncmp(env->key, "PATH", 4) == 0)
-			return (env->value);
-		env = env->next;
-	}
-	return (NULL);
-}
-
-char	*full_path(char *argv)
-{
-	if (!argv)
-		return (NULL);
-	if (access(argv, X_OK) == 0)
-	{
-		return (ft_strdup(argv));
-	}
-	return (NULL);
-}
-
-char	**check_path(char *argv, t_shell *shell)
-{
-	char *path_env;
-	char **paths;
-
-	if (!argv)
-		return (NULL);
-	
-	path_env = get_path_env(shell);
-	
-	if (!path_env)
-		return (NULL);
-	paths = ft_split(path_env, ':');
-
-	return (paths);
-}
-
-char	*get_path(char *argv, t_shell *shell)
-{
-	char	*tmp;
-	char	**paths;
-	char 	*fullpath;
-	int		i;
-
-	if (ft_strchr(argv, '/'))
-		return (full_path(argv));
-	
-	paths = check_path(argv, shell);
-	
-	if (!paths)
-		return (NULL);
-	i = 0;
-	while(paths[i])
-	{
-		ft_trim_end(paths[i], ':');
-		tmp = ft_strjoin(paths[i], "/");
-		
-		fullpath = ft_strjoin(tmp, argv);
-		free(tmp);
-		if (access(fullpath, X_OK) == 0)
-		{
-			//might have to free the split here;
-			return (fullpath);
-		}
-		free(fullpath);
-		i++;
-	}
-	//ft_freesplit() here too;
-	return (NULL);
-	
-}
 
 void	exec_cmd(t_tree *tree, t_shell *shell)
 {
@@ -131,7 +54,6 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 
 	if (!tree)
 		return ;
-	
 	if (is_builtin(tree->argv[0]))
 		execute_builtin(tree->argv, shell);
 	else
@@ -141,7 +63,6 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 		{
 			setup_signals_child();
 			path = get_path(tree->argv[0], shell);
-			
 			if (!path)
 			{
 				perror("command not foudn");
@@ -169,6 +90,54 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 	}
 }
 
+
+void	write_lines(char *argv)
+{
+	int	fd[2];
+
+	pipe(fd);
+	if (fork() == 0)
+	{
+		close(fd[0]);
+			write(fd[1], argv, ft_strlen(argv));
+			write(fd[1], "\n", 1);
+		close(fd[1]);
+		exit(0);
+	}
+	else
+	{
+		close(fd[1]);
+		dup2(fd[0], STDIN_FILENO);
+		close(fd[0]);
+	}
+}
+
+
+void exec_with_redir(t_tree *tree, t_shell *shell)
+{
+	int		outfd;
+	int		infd;
+
+	outfd = dup(STDOUT_FILENO);
+	infd = dup(STDIN_FILENO);
+	while(tree->redirections && tree->redirections->filename && tree->redirections->type)
+	{
+				if (tree->redirections->type == REDIR_APPEND)
+					redir_append(tree->redirections->filename);
+				else if (tree->redirections->type == REDIR_OUT)
+					redir_output(tree->redirections->filename);
+				else if (tree->redirections->type == REDIR_IN)
+					redir_input(tree->redirections->filename);
+				else if (tree->redirections->type == REDIR_HEREDOC)
+					write_lines(tree->redirections->filename);
+			tree->redirections = tree->redirections->next;
+	}
+		exec_cmd(tree, shell);
+		dup2(outfd, STDOUT_FILENO);
+		dup2(infd, STDIN_FILENO);
+		close(outfd);
+		close(infd);
+}
 void	exec_tree(t_tree *tree, t_shell *shell)
 {
 	if (!tree)
@@ -180,7 +149,7 @@ void	exec_tree(t_tree *tree, t_shell *shell)
 	}
 	else if (tree->type == WORD)
 	{
-		exec_cmd(tree, shell);
+		exec_with_redir(tree, shell);
 		return ;
 	}
 }
