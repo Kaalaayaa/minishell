@@ -45,7 +45,7 @@ int	word_handle(const char *s, t_token **token)
 			i++;
 	}
 	d = malloc(sizeof(char) * (i + 1));
-	ft_strlcpy(d, s, i);
+	ft_strlicpy(d, s, i);
 	add_token(token, WORD, d);
 	return (i);
 }
