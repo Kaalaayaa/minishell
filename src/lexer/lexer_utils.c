@@ -48,7 +48,7 @@ int	is_operator_start(char c)
 	return (c == '|' || c == '<' || c == '>');
 }
 
-size_t	ft_strlcpy(char *dest, const char *src, size_t size)
+size_t	ft_strlicpy(char *dest, const char *src, size_t size)
 {
 	unsigned int	i;
 

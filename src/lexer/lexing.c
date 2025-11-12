@@ -10,6 +10,11 @@ void	add_token(t_token **tokens, enum e_type type, char *s)
 	if (!new)
 		return ;
 	new->token = ft_strdup(s);
+	if (!new->token)
+	{
+		free(new);
+		return ;
+	}
 	new->type = type;
 	new->next = NULL;
 	if (*tokens == NULL)
@@ -38,15 +43,16 @@ int	word_handle(const char *s, t_token **token)
 			while (s[i] && s[i] != qoute)
 				i++;
 			if (s[i] == '\0')
-				return (i); // incase of misaligned qoutes;
+				return (i);
 			i++;
 		}
 		else
 			i++;
 	}
 	d = malloc(sizeof(char) * (i + 1));
-	ft_strlcpy(d, s, i);
+	ft_strlicpy(d, s, i);
 	add_token(token, WORD, d);
+	free(d);
 	return (i);
 }
 
@@ -60,10 +66,8 @@ char	*adjust_input(char *i, t_token **tokens, enum e_type type, char *s)
 t_token	*lexer(char *input)
 {
 	t_token	*tokens;
-	char	*tmp;
 
 	tokens = NULL;
-	tmp = input;
 	while (*input)
 	{
 		if (ft_isspace(*input))
@@ -81,7 +85,6 @@ t_token	*lexer(char *input)
 		else
 			input += word_handle(input, &tokens);
 	}
-	free(tmp);
 	return (tokens);
 }
 /*

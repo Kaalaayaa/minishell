@@ -109,6 +109,7 @@ void	shell_init(t_shell *shell, char **envp);
 t_token	*lexer(char *input);
 int		ft_isspace(char c);
 int		is_operator_start(char c);
+size_t	ft_strlicpy(char *dest, const char *src, size_t size);
 
 /* ************************** */
 /*          PARSER             */
@@ -159,7 +160,7 @@ char	*env_to_str(t_env *env);
 /*         EXECUTION            */
 /* ************************** */
 
-void	exec_tree(t_tree *tree, t_shell *shell);
+void	exec_tree(t_token *tokens, t_tree *tree, t_shell *shell);
 void	ft_trim_end(char *arr, char c);
 char	*get_path(char *argv, t_shell *shell);
 
@@ -171,6 +172,12 @@ void	setup_signals_prompt(void);
 void	setup_signals_child(void);
 void	setup_signals_parent(void);
 
+/* *************************** */
+/*           CLEANUP           */
+/* *************************** */
+
+void	cleanup(t_token **tokens, t_shell *shell, t_tree **root);
+void free_split(char **argv);
 
 int		ft_strcmp(const char *s1, const char *s2);// TO ADD TO LIBFT
 

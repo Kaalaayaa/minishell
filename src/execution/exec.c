@@ -1,9 +1,8 @@
 #include "../includes/minishell.h"
 
-
-void	exec_pipe(t_tree *tree, t_shell *shell)
+void	exec_pipe(t_token *tokens, t_tree *tree, t_shell *shell)
 {
-	int	fd[2];
+	int		fd[2];
 	pid_t	left_pid;
 	pid_t	right_pid;
 	int		status;
@@ -12,7 +11,6 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 		return ;
 	if (pipe(fd) == -1)
 		return ;
-
 	left_pid = fork();
 	if (left_pid == 0)
 	{
@@ -20,7 +18,7 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[0]);
 		close(fd[1]);
-		exec_tree(tree->left, shell);
+		exec_tree(tokens, tree->left, shell);
 		exit(0);
 	}
 	right_pid = fork();
@@ -30,7 +28,7 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 		dup2(fd[0], STDIN_FILENO);
 		close(fd[0]);
 		close(fd[1]);
-		exec_tree(tree->right, shell);
+		exec_tree(tokens, tree->right, shell);
 		exit(0);
 	}
 	close(fd[0]);
@@ -39,19 +37,48 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 	waitpid(left_pid, NULL, 0);
 	waitpid(right_pid, &status, 0);
 	if (WIFEXITED(status))
-		shell->exit_status = WEXITSTATUS(status);	
+		shell->exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
 		shell->exit_status = 128 + WTERMSIG(status);
 	setup_signals_prompt();
 }
 
+char	**make_envp(t_shell *shell)
+{
+	char	**ret;
+	t_env	*tmp;
+	int		i;
 
-void	exec_cmd(t_tree *tree, t_shell *shell)
+	if (!shell->env_list)
+		return (NULL);
+	tmp = shell->env_list;
+	i = 0;
+	while (tmp)
+	{
+		i++;
+		tmp = tmp->next;
+	}
+	tmp = shell->env_list;
+	ret = malloc(sizeof(*ret) * (i + 1));
+	i = 0;
+	while (tmp)
+	{
+		ret[i] = ft_strjoin(tmp->key, "=");
+		ret[i] = ft_strjoin(ret[i], tmp->value);
+		i++;
+		tmp = tmp->next;
+	}
+	ret[i] = NULL;
+	return (ret);
+}
+
+void	exec_cmd(t_token *tokens, t_tree *tree, t_shell *shell)
 {
 	pid_t	pid;
 	char	*path;
 	int		status;
-
+	char **envp;
+	(void)tokens;
 	if (!tree)
 		return ;
 	if (is_builtin(tree->argv[0]))
@@ -68,18 +95,20 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 				perror("command not foudn");
 				exit(127);
 			}
-			execve(path, tree->argv, NULL); // the null here needs to be char**envp
+			envp = make_envp(shell);
+			execve(path, tree->argv, envp);
+			free_split(envp);
 		}
 		else if (pid > 0)
 		{
 			setup_signals_parent();
 			waitpid(pid, &status, 0);
 			setup_signals_prompt();
-			if (WIFEXITED(status)) // killed normally 
-				shell->exit_status = WEXITSTATUS(status); 
+			if (WIFEXITED(status)) // killed normally
+				shell->exit_status = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status)) // killed by signal
 			{
-				int	sig = WTERMSIG(status); // get signal number
+				int sig = WTERMSIG(status); // get signal number
 				shell->exit_status = 128 + sig;
 				if (sig == SIGQUIT)
 					printf("Quit (core dumped)\n");
@@ -90,7 +119,6 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 	}
 }
 
-
 void	write_lines(char *argv)
 {
 	int	fd[2];
@@ -99,8 +127,8 @@ void	write_lines(char *argv)
 	if (fork() == 0)
 	{
 		close(fd[0]);
-			write(fd[1], argv, ft_strlen(argv));
-			write(fd[1], "\n", 1);
+		write(fd[1], argv, ft_strlen(argv));
+		write(fd[1], "\n", 1);
 		close(fd[1]);
 		exit(0);
 	}
@@ -112,44 +140,45 @@ void	write_lines(char *argv)
 	}
 }
 
-
-void exec_with_redir(t_tree *tree, t_shell *shell)
+void	exec_with_redir(t_token *tokens, t_tree *tree, t_shell *shell)
 {
-	int		outfd;
-	int		infd;
+	int	outfd;
+	int	infd;
 
 	outfd = dup(STDOUT_FILENO);
 	infd = dup(STDIN_FILENO);
-	while(tree->redirections && tree->redirections->filename && tree->redirections->type)
+	while (tree->redirections && tree->redirections->filename
+		&& tree->redirections->type)
 	{
-				if (tree->redirections->type == REDIR_APPEND)
-					redir_append(tree->redirections->filename);
-				else if (tree->redirections->type == REDIR_OUT)
-					redir_output(tree->redirections->filename);
-				else if (tree->redirections->type == REDIR_IN)
-					redir_input(tree->redirections->filename);
-				else if (tree->redirections->type == REDIR_HEREDOC)
-					write_lines(tree->redirections->filename);
-			tree->redirections = tree->redirections->next;
+		if (tree->redirections->type == REDIR_APPEND)
+			redir_append(tree->redirections->filename);
+		else if (tree->redirections->type == REDIR_OUT)
+			redir_output(tree->redirections->filename);
+		else if (tree->redirections->type == REDIR_IN)
+			redir_input(tree->redirections->filename);
+		else if (tree->redirections->type == REDIR_HEREDOC)
+			write_lines(tree->redirections->filename);
+		tree->redirections = tree->redirections->next;
 	}
-		exec_cmd(tree, shell);
-		dup2(outfd, STDOUT_FILENO);
-		dup2(infd, STDIN_FILENO);
-		close(outfd);
-		close(infd);
+	exec_cmd(tokens, tree, shell);
+	dup2(outfd, STDOUT_FILENO);
+	dup2(infd, STDIN_FILENO);
+	close(outfd);
+	close(infd);
 }
-void	exec_tree(t_tree *tree, t_shell *shell)
+
+void	exec_tree(t_token *tokens, t_tree *tree, t_shell *shell)
 {
 	if (!tree)
 		return ;
 	if (tree->type == PIPE)
-	{	
-		exec_pipe(tree, shell);
+	{
+		exec_pipe(tokens, tree, shell);
 		return ;
 	}
 	else if (tree->type == WORD)
 	{
-		exec_with_redir(tree, shell);
+		exec_with_redir(tokens, tree, shell);
 		return ;
 	}
 }
