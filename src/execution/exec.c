@@ -38,10 +38,14 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 	setup_signals_parent();
 	waitpid(left_pid, NULL, 0);
 	waitpid(right_pid, &status, 0);
-	if (WIFEXITED(status))
+	if (WIFEXITED(status)){
 		shell->exit_status = WEXITSTATUS(status);	
+	}
+
 	else if (WIFSIGNALED(status))
+	{
 		shell->exit_status = 128 + WTERMSIG(status);
+	}
 	setup_signals_prompt();
 }
 
@@ -75,8 +79,11 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 			setup_signals_parent();
 			waitpid(pid, &status, 0);
 			setup_signals_prompt();
-			if (WIFEXITED(status)) // killed normally 
-				shell->exit_status = WEXITSTATUS(status); 
+			if (WIFEXITED(status))
+			{// killed normally 
+				printf("DEBUG: setting exit_status from heredoc22: %d\n", 130);
+				shell->exit_status = WEXITSTATUS(status);
+			}
 			else if (WIFSIGNALED(status)) // killed by signal
 			{
 				int	sig = WTERMSIG(status); // get signal number

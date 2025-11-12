@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 15:23:35 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/10/31 17:12:54 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/11/12 15:34:04 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int	is_operator_start(char c)
 	return (c == '|' || c == '<' || c == '>');
 }
 
-size_t	ft_strlcpy(char *dest, const char *src, size_t size)
+size_t	ft_strlicpy(char *dest, const char *src, size_t size)
 {
 	unsigned int	i;
 

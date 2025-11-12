@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 15:23:21 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/10/31 17:09:45 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/11/12 16:08:07 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ t_tree	*init_tree(t_type s)
 	return (ret);
 }
 
-t_tree	*parse_e(t_token **tokens)
+t_tree	*parse_e(t_token **tokens, t_shell *shell)
 {
 	t_tree	*left;
 	t_tree	*right;
@@ -91,7 +91,7 @@ t_tree	*parse_e(t_token **tokens)
 		return (NULL);
 	left = init_tree(WORD);
 	left->argv = parse_simple_command(*tokens);
-	left->redirections = apply_redirections(left->argv);
+	left->redirections = apply_redirections(left->argv, shell);
 	while (*tokens && (*tokens)->type == WORD)
 		*tokens = (*tokens)->next;
 	while (*tokens && (*tokens)->type == PIPE)
@@ -99,7 +99,7 @@ t_tree	*parse_e(t_token **tokens)
 		*tokens = (*tokens)->next;
 		right = init_tree(WORD);
 		right->argv = parse_simple_command(*tokens);
-		right->redirections = apply_redirections(right->argv);
+		right->redirections = apply_redirections(right->argv, shell);
 		pipe_node = add_tree_node("|", PIPE);
 		pipe_node->right = right;
 		pipe_node->left = left;

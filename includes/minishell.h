@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 09:34:36 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/04 19:06:12 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/11/12 17:43:35 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ typedef struct s_shell
 void	redir_output(char *filename);
 void	redir_append(char *filename);
 void	redir_input(char *filename);
-t_redir *apply_redirections(char **argv);
+t_redir *apply_redirections(char **argv, t_shell *shell);
 
 void	shell_init(t_shell *shell, char **envp);
 
@@ -109,12 +109,13 @@ void	shell_init(t_shell *shell, char **envp);
 t_token	*lexer(char *input);
 int		ft_isspace(char c);
 int		is_operator_start(char c);
+size_t	ft_strlicpy(char *dest, const char *src, size_t size);
 
 /* ************************** */
 /*          PARSER             */
 /* ************************** */
 
-t_tree	*parse_e(t_token **tokens);
+t_tree	*parse_e(t_token **tokens, t_shell *shell);
 void	print_tree(t_tree *node, int depth);
 
 /* ************************** */
@@ -170,6 +171,8 @@ char	*get_path(char *argv, t_shell *shell);
 void	setup_signals_prompt(void);
 void	setup_signals_child(void);
 void	setup_signals_parent(void);
+void	setup_signals_heredoc(void);
+
 
 
 int		ft_strcmp(const char *s1, const char *s2);// TO ADD TO LIBFT
