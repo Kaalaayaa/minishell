@@ -18,7 +18,6 @@ int	change_directory(char *target, char *oldcwd, t_shell *shell, int print_path)
 	if (chdir(target) != 0)
 	{
 		perror("cd");
-		shell->exit_status = 1;
 		return (1);
 	}
 	if (getcwd(newcwd, sizeof(newcwd)))
@@ -28,7 +27,6 @@ int	change_directory(char *target, char *oldcwd, t_shell *shell, int print_path)
 		if (print_path)
 			printf("%s\n", newcwd);
 	}
-	shell->exit_status = 0;
 	return (0);
 }
 
@@ -41,9 +39,8 @@ int	builtin_cd(char **argv, t_shell *shell)
 	print_path = 0;
 	if (argv[2])
 	{
-		print_error(" too many arguments\n", NULL, NULL);
-		shell->exit_status = 1;
-		return (0);
+		print_error("minishell: cd: ", "too many arguments\n", NULL);
+		return (1);
 	}
 		//save current directory in oldcwd
 	if (getcwd(oldcwd, sizeof(oldcwd)) == NULL)
@@ -63,7 +60,6 @@ int	builtin_cd(char **argv, t_shell *shell)
 	if (!target)
 	{
 		printf("cd: HOME not set\n");
-		shell->exit_status = 1;
 		return (1);
 	}
 	return (change_directory(target, oldcwd, shell, print_path));

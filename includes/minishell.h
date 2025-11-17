@@ -137,7 +137,7 @@ char	*ft_strjoin_free(char *s1, char *s2, int flag);
 /* ************************** */
 
 bool	is_builtin(const char *cmd);
-void	execute_builtin(char **cmd, t_shell *shell);
+int	execute_builtin(char **cmd, t_shell *shell);
 int		builtin_echo(char **argv);
 int		builtin_pwd(void);
 int		builtin_env(t_shell *shell);

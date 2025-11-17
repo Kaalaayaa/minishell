@@ -109,14 +109,14 @@ void exec_cmd(t_tree *tree, t_shell *shell)
             if (pid == 0)
             {
                 setup_signals_child();
-                execute_builtin(tree->argv, shell);
+                shell->exit_status = execute_builtin(tree->argv, shell);
                 exit(shell->exit_status);
             }
             waitpid(pid, &status, 0);
             shell->exit_status = WEXITSTATUS(status);
         }
         else
-            execute_builtin(tree->argv, shell);
+            shell->exit_status = execute_builtin(tree->argv, shell);
         return;
     }
     envp = get_envp(shell->env_list);
