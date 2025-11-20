@@ -169,6 +169,25 @@ char			*env_to_str(t_env *env);
 void			exec_tree(t_tree *tree, t_shell *shell);
 void			ft_trim_end(char *arr, char c);
 char			*get_path(char *argv, t_shell *shell);
+char			*full_path(char *argv);
+char			**check_path(char *argv, t_shell *shell);
+char			*get_path(char *argv, t_shell *shell);
+void			check_slash_path(char **envp, char *path, t_tree *tree);
+void			check_normal_path(char **envp, char *path, t_tree *tree);
+void			free_exec_resources(char **envp, char *path);
+void			verify_path(char **envp, char *path, t_tree *tree);
+void			write_lines(char *argv);
+void			update_exit_status(int status, t_shell *shell);
+void			print_and_exit(char *s1, char *s2, char *s3, int exitcode);
+int				env_count(t_env *env);
+char			*env_join(char *key, char *value);
+int				redir_allocation(t_redir *redirections, t_shell *shell);
+char			**get_envp(t_env *env);
+int				run_parent_builtin(t_tree *tree, t_shell *shell);
+void			child_exec(t_tree *tree, t_shell *shell, 
+					char **envp, char *path);
+void			pipe_end(int *fd, int side, t_tree *tree, t_shell *shell);
+void			execute_foreign(char **envp, char *path, t_tree *tree);
 
 /* ************************** */
 /*          SIGNALS             */

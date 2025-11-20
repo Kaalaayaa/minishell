@@ -26,7 +26,7 @@ static void	process_char(int *idx, int *j, char *in_quote, char *res)
 	{
 		update_quote(str[*idx], in_quote);
 		if (!((str[*idx] == '\'' || str[*idx] == '"')
-			&& (*in_quote == 0 || *in_quote == str[*idx])))
+				&& (*in_quote == 0 || *in_quote == str[*idx])))
 		{
 			res[*j] = str[*idx];
 			(*j)++;
