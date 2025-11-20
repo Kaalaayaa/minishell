@@ -158,10 +158,13 @@ t_redir *apply_redirections(char **argv, t_shell *shell)
     t_redir *new_node;
     int i = 0;
 
+	if (!argv)
+		return (NULL);
     while (argv[i])
-    {
+    {	
         if (is_redirection(argv[i]) && argv[i + 1])
         {
+			
             new_node = add_redir_node();
             if (!new_node)
             {
@@ -179,14 +182,14 @@ t_redir *apply_redirections(char **argv, t_shell *shell)
                 ret->next = new_node;
                 ret = ret->next;
             }
-
-            // If alot_redirection fails, free the node
             alot_redirection(&ret, argv, i, shell);
-
-            i -= 2; // Adjust index after deleting tokens
+           // i -= 2; // Adjust index after deleting tokens
         }
+		else
+		{
         i++;
+		}
     }
-
+	
     return (head);
 }

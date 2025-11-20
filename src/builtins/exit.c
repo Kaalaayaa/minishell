@@ -51,7 +51,12 @@ int	builtin_exit(char **argv, t_shell *shell)
 
 	exit_status = shell->exit_status;
 	if (!argv[1])
+	{
+		cleanup(NULL, NULL, shell);
+		rl_clear_history();
+		clear_history();
 		exit(exit_status);
+	}
 	if (argv[2])
 	{
 		print_error("minishell: exit: ", "too many arguments\n", NULL);
@@ -60,8 +65,14 @@ int	builtin_exit(char **argv, t_shell *shell)
 	if (!is_valid_exit_nbr(argv[1]))
 	{
 		print_error("minishell: exit: ", "numeric argument required\n", NULL);
+		cleanup(NULL, NULL, shell);
+		rl_clear_history();
+		clear_history();
 		exit(2);
 	}
 	exit_status = get_exit_status(argv[1]);
+	cleanup(NULL, NULL, shell);
+	rl_clear_history();
+	clear_history();
 	exit(exit_status);
 }

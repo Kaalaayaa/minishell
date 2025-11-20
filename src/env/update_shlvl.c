@@ -18,6 +18,7 @@ void update_shlvl(t_shell *shell)
 
 	shlvl_str = get_env_value(shell->env_list, "SHLVL");
 	shlvl = get_shlvl_num(shlvl_str);
+	
 	new_shlvl = ft_itoa(shlvl);
 	if (!new_shlvl)
 		return;

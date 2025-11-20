@@ -22,6 +22,8 @@ int	main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	(void)envp;
+	tokens = NULL;
+	root = NULL;
 	shell_init(&shell, envp);
 	while (1)
 	{
@@ -40,21 +42,37 @@ int	main(int argc, char **argv, char **envp)
 			g_signal_status = 0;
 		}
 		tokens = lexer(line);
+        
 		tokens = expander(tokens, &shell);
+        
 		tokens = syntax(tokens, &shell);
-		root = parse_e(&tokens, &shell);
-		if (g_signal_status == 1)
+        
+		if (tokens)
 		{
-			shell.exit_status = 130;
-			g_signal_status = 0;
-			// free(line);
-			continue ;
+            
+			root = parse_e(&tokens, &shell);
+            
+			if (g_signal_status == 1)
+			{
+				shell.exit_status = 130;
+				g_signal_status = 0;
+				cleanup(tokens, root, NULL);
+			}
+			else
+			{
+                
+				exec_tree(root, &shell);
+				cleanup(tokens, root, NULL);
+			}
 		}
-		// print_tree(root, 0);
-		exec_tree(root, &shell);
-		cleanup(tokens, root, NULL);
+		else
+			free_tokens(tokens);
 		free(line);
+		tokens = NULL;
+		root = NULL;
 	}
+	cleanup(NULL, NULL, &shell);
 	rl_clear_history();
+	clear_history();
 	return (0);
 }
