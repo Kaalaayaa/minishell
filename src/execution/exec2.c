@@ -52,7 +52,7 @@ char	**get_envp(t_env *env)
 		ret[i] = env_join(tmp->key, tmp->value);
 		if (!ret[i])
 		{
-			free_split(ret, --i);
+			free_split(ret);
 			return (NULL);
 		}
 		i++;

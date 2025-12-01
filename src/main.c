@@ -24,7 +24,7 @@ static void	check_signal(t_shell *shell)
 static void	process_command(char *line, t_shell *shell)
 {
 	t_token	*tokens;
-	t_tree	*root;
+//	t_tree	*root;
 
 	if (line[0] != '\0')
 		add_history(line);
@@ -32,15 +32,16 @@ static void	process_command(char *line, t_shell *shell)
 	tokens = lexer(line);
 	tokens = expander(tokens, shell);
 	tokens = syntax(tokens, shell);
-	root = parse_e(&tokens, shell);
+	shell->tokens = tokens;
+	shell->tree = parse_e(&tokens, shell);
 	if (g_signal_status == 1)
 	{
 		check_signal(shell);
-		cleanup(tokens, root, NULL);
+		cleanup(tokens, shell->tree, NULL);
 		return ;
 	}
-	exec_tree(root, shell);
-	cleanup(tokens, root, NULL);
+	exec_tree(shell->tree, shell);
+	cleanup(tokens, shell->tree, NULL);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -68,3 +69,4 @@ int	main(int argc, char **argv, char **envp)
 	rl_clear_history();
 	return (0);
 }
+// valgrind --suppressions=suppressions.supp --track-fds=yes --show-leak-kinds=all ./minishell

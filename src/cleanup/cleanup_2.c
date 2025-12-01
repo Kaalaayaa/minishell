@@ -30,31 +30,18 @@ char	*ft_strjoin_free(char *s1, char *s2, int flag)
 	return (res);
 }
 
-void	free_split(char **argv, int order)
+void	free_split(char **argv)
 {
 	int	i;
 
 	if (!argv)
 		return ;
-	if (order == 0)
+	i = 0;
+	while (argv[i])
 	{
-		i = 0;
-		while (argv[i])
-		{
-			free(argv[i]);
-			argv[i] = NULL;
-			i++;
-		}
-	}
-	else
-	{
-		i = order;
-		while (i > 0)
-		{
-			free(argv[i]);
-			argv[i] = NULL;
-			i--;
-		}
+		free(argv[i]);
+		argv[i] = NULL;
+		i++;
 	}
 	free(argv);
 }

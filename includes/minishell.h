@@ -87,6 +87,8 @@ typedef struct s_env
 typedef struct s_shell
 {
 	t_env			*env_list;
+	t_token			*tokens;
+	t_tree			*tree;
 	bool			in_pipe;
 	int				line_number;
 	int				exit_status;
@@ -207,7 +209,7 @@ void			setup_signals_heredoc(void);
 /* ************************** */
 
 char			*ft_strjoin_free(char *s1, char *s2, int flag);
-void			free_split(char **argv, int order);
+void			free_split(char **argv);
 void			cleanup(t_token *tokens, t_tree *tree, t_shell *shell);
 void			free_redir(t_redir *redir);
 void			free_tokens(t_token *tokens);
