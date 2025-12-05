@@ -12,13 +12,30 @@
 
 #include "../includes/minishell.h"
 
-int	write_lines(char *argv)
+static int	write_lines_child(char *argv, int fd[2])
 {
-	int		fd[2];
+	close(fd[0]);
+	close_fd_in_range(2, fd[1]);
+	close_fd_in_range(fd[1], 1024);
+	write(fd[1], argv, ft_strlen(argv));
+	write(fd[1], "\n", 1);
+	close(fd[1]);
+	exit(0);
+}
+
+static int	write_lines_parent(pid_t pid, int fd[2])
+{
+	close(fd[1]);
+	dup2(fd[0], STDIN_FILENO);
+	close(fd[0]);
+	waitpid(pid, NULL, 0);
+	return (1);
+}
+
+static int	write_lines_fork(char *argv, int fd[2])
+{
 	pid_t	pid;
 
-	if (!argv || pipe(fd) == -1)
-		return (0);
 	pid = fork();
 	if (pid == -1)
 	{
@@ -27,23 +44,17 @@ int	write_lines(char *argv)
 		return (0);
 	}
 	if (pid == 0)
-	{
-		close(fd[0]);
-		close_fd_in_range(2, fd[1]);
-		close_fd_in_range(fd[1], 1024);
-		write(fd[1], argv, ft_strlen(argv));
-		write(fd[1], "\n", 1);
-		close(fd[1]);
-		exit(0);
-	}
-	else
-	{
-		close(fd[1]);
-		dup2(fd[0], STDIN_FILENO);
-		close(fd[0]);
-		waitpid(pid, NULL, 0);
-	}
-	return (1);
+		write_lines_child(argv, fd);
+	return (write_lines_parent(pid, fd));
+}
+
+int	write_lines(char *argv)
+{
+	int		fd[2];
+
+	if (!argv || pipe(fd) == -1)
+		return (0);
+	return write_lines_fork(argv, fd);
 }
 
 void	update_exit_status(int status, t_shell *shell)

@@ -70,4 +70,5 @@ int	main(int argc, char **argv, char **envp)
 	rl_clear_history();
 	return (0);
 }
+
 // valgrind --suppressions=suppressions.supp --track-fds=yes --show-leak-kinds=all ./minishell

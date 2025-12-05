@@ -12,41 +12,62 @@
 
 #include "../includes/minishell.h"
 
-void	exec_pipe(t_tree *tree, t_shell *shell)
+static int	pipe_init_and_left_fork(t_tree *tree, t_shell *shell, int fd[2], pid_t *left_pid)
 {
-	int		fd[2];
-	pid_t	left_pid;
-	pid_t	right_pid;
-	int		status;
-
 	if (!tree || !shell || pipe(fd) == -1)
-		return ;
+		return (1);
 	shell->in_pipe = true;
-	left_pid = fork();
-	if (left_pid == -1)
+	*left_pid = fork();
+	if (*left_pid == -1)
 	{
 		close(fd[0]);
 		close(fd[1]);
-		return ;
+		return (1);
 	}
-	if (left_pid == 0)
+	if (*left_pid == 0)
 		pipe_end(fd, 0, tree, shell);
-	right_pid = fork();
-	if (right_pid == -1)
+	return (0);
+}
+
+static int	pipe_right_fork(t_shell *shell, int fd[2], pid_t left_pid, pid_t *right_pid)
+{
+	*right_pid = fork();
+	if (*right_pid == -1)
 	{
 		close(fd[0]);
 		close(fd[1]);
 		waitpid(left_pid, NULL, 0);
-		return ;
+		return (1);
 	}
-	if (right_pid == 0)
-		pipe_end(fd, 1, tree, shell);
+	if (*right_pid == 0)
+		pipe_end(fd, 1, shell->tree, shell);
+	return (0);
+}
+
+static void	pipe_cleanup_and_status(t_shell *shell, 
+	int fd[2], pid_t left_pid, pid_t right_pid)
+{
+	int	status;
+
 	close(fd[0]);
 	close(fd[1]);
 	waitpid(left_pid, NULL, 0);
 	waitpid(right_pid, &status, 0);
 	shell->in_pipe = false;
 	handle_pipe_status(status, shell);
+}
+
+void	exec_pipe(t_tree *tree, t_shell *shell)
+{
+	int		fd[2];
+	pid_t	left_pid;
+	pid_t	right_pid;
+
+	if (pipe_init_and_left_fork(tree, shell, fd, &left_pid))
+		return ;
+	if (pipe_right_fork(shell, fd, left_pid, &right_pid))
+		return ;
+	pipe_cleanup_and_status(shell, fd, left_pid, right_pid);
 }
 
 void	execute_foreign(char **envp, char *path, t_tree *tree)
@@ -70,23 +91,36 @@ void	execute_foreign(char **envp, char *path, t_tree *tree)
 	exit(127);
 }
 
-void	exec_cmd(t_tree *tree, t_shell *shell)
+static int	exec_cmd_prechecks(t_tree *tree, t_shell *shell)
+{
+	if (!tree || !tree->argv || !tree->argv[0])
+		return (1);
+	if (handle_var_assignment(tree, shell))
+		return (1);
+	if (run_parent_builtin(tree, shell))
+		return (1);
+	return (0);
+}
+
+static int	exec_cmd_setup(t_tree *tree, t_shell *shell, char ***envp, char **path)
+{
+	*envp = get_envp(shell->env_list);
+	*path = get_path(tree->argv[0], shell);
+	if (check_path_unset(tree, shell, *envp, *path))
+	{
+		free_exec_resources(*envp, *path);
+		return (1);
+	}
+	if (!shell->in_pipe)
+		setup_signals_parent();
+	return (0);
+}
+
+static void	exec_cmd_fork_exec(t_tree *tree, t_shell *shell, char **envp, char *path)
 {
 	pid_t	pid;
 	int		status;
-	char	**envp;
-	char	*path;
 
-	if (!tree || !tree->argv || !tree->argv[0])
-		return ;
-	if (handle_var_assignment(tree, shell) || run_parent_builtin(tree, shell))
-		return ;
-	envp = get_envp(shell->env_list);
-	path = get_path(tree->argv[0], shell);
-	if (check_path_unset(tree, shell, envp, path))
-		return ;
-	if (!shell->in_pipe)
-		setup_signals_parent();
 	pid = fork();
 	if (pid == -1)
 	{
@@ -100,6 +134,18 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 		setup_signals_prompt();
 	free_exec_resources(envp, path);
 	handle_cmd_signal(status, shell);
+}
+
+void	exec_cmd(t_tree *tree, t_shell *shell)
+{
+	char	**envp;
+	char	*path;
+
+	if (exec_cmd_prechecks(tree, shell))
+		return ;
+	if (exec_cmd_setup(tree, shell, &envp, &path))
+		return ;
+	exec_cmd_fork_exec(tree, shell, envp, path);
 }
 
 void	exec_with_redir(t_tree *tree, t_shell *shell)

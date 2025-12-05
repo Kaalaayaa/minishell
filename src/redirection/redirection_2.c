@@ -27,6 +27,14 @@ void	delete_line(char **argv, int index)
 	}
 }
 
+void	print_heredoc_error(char *line_number, const char *file)
+{
+	print_error("minishell: warning: here-document at line ",
+		line_number, " delimited by end-of-file (wanted `");
+	print_error((char *)file, "')", NULL);
+	free(line_number);
+}
+
 static char	*heredoc_collect(t_shell *shell, const char *file)
 {
 	char	*line;
@@ -42,10 +50,7 @@ static char	*heredoc_collect(t_shell *shell, const char *file)
 		line_number = ft_itoa(shell->line_number);
 		if (!line)
 		{
-			print_error("minishell: warning: here-document at line ",
-				line_number, " delimited by end-of-file (wanted `");
-			print_error((char *)file, "')", NULL);
-			free(line_number);
+			print_heredoc_error(line_number, file);
 			break ;
 		}
 		free(line_number);
