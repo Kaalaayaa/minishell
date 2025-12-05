@@ -51,7 +51,7 @@ void	free_tree(t_tree *tree)
 	free_tree(tree->right);
 	tree->right = NULL;
 	if (tree->argv)
-		free_split(tree->argv, 0);
+		free_split(tree->argv);
 	if (tree->redirections)
 		free_redir(tree->redirections);
 	if (tree->token)

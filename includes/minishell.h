@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 09:34:36 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/19 19:29:47 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/12/05 20:07:20 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,8 @@ typedef struct s_env
 typedef struct s_shell
 {
 	t_env			*env_list;
+	t_token			*tokens;
+	t_tree			*tree;
 	bool			in_pipe;
 	int				line_number;
 	int				exit_status;
@@ -105,6 +107,7 @@ void			shell_init(t_shell *shell, char **envp);
 int				redir_allocation(t_redir *redir, t_shell *shell);
 char			*get_heredoc(char *file, t_shell *shell);
 void			delete_line(char **argv, int index);
+void			print_heredoc_error(char *line_number, const char *file);
 
 /* ************************** */
 /*          LEXER              */
@@ -129,6 +132,8 @@ t_token			*syntax(t_token *tokens, t_shell *shell);
 
 t_token			*expander(t_token *tokens, t_shell *shell);
 char			*expand_env(const char *s, t_shell *shell);
+char			*expand_env_inside_dquote(const char *str, t_shell *shell);
+size_t			handle_single_quote(const char *str, size_t i, char **res);
 char			*extract_env_key(char *s);
 void			append_and_free(char **res, const char *add);
 void			append_env_value(char **res, char *value);
@@ -177,8 +182,10 @@ void			check_slash_path(char **envp, char *path, t_tree *tree);
 void			check_normal_path(char **envp, char *path, t_tree *tree);
 void			free_exec_resources(char **envp, char *path);
 void			verify_path(char **envp, char *path, t_tree *tree);
-void			write_lines(char *argv);
+int				write_lines(char *argv);
 void			update_exit_status(int status, t_shell *shell);
+void			handle_pipe_status(int status, t_shell *shell);
+void			handle_cmd_signal(int status, t_shell *shell);
 void			print_and_exit(char *s1, char *s2, char *s3, int exitcode);
 int				env_count(t_env *env);
 char			*env_join(char *key, char *value);
@@ -192,6 +199,18 @@ void			execute_foreign(char **envp, char *path, t_tree *tree);
 int				handle_var_assignment(t_tree *tree, t_shell *shell);
 int				check_path_unset(t_tree *tree, t_shell *shell, char **envp,
 					char *path);
+void			close_fd_in_range(int a, int b);
+int				pipe_init_and_left_fork(t_tree *tree, t_shell *shell,
+					int fd[2], pid_t *left_pid);
+int				pipe_right_fork(t_shell *shell, int fd[2],
+					pid_t left_pid, pid_t *right_pid);
+void			pipe_cleanup_and_status(t_shell *shell,
+					int fd[2], pid_t left_pid, pid_t right_pid);
+int				exec_cmd_prechecks(t_tree *tree, t_shell *shell);
+int				exec_cmd_setup(t_tree *tree, t_shell *shell,
+					char ***envp, char **path);
+void			exec_cmd_fork_exec(t_tree *tree, t_shell *shell,
+					char **envp, char *path);
 
 /* ************************** */
 /*          SIGNALS             */
@@ -207,7 +226,7 @@ void			setup_signals_heredoc(void);
 /* ************************** */
 
 char			*ft_strjoin_free(char *s1, char *s2, int flag);
-void			free_split(char **argv, int order);
+void			free_split(char **argv);
 void			cleanup(t_token *tokens, t_tree *tree, t_shell *shell);
 void			free_redir(t_redir *redir);
 void			free_tokens(t_token *tokens);

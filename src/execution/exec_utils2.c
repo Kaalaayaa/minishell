@@ -32,12 +32,12 @@ char	*get_path(char *argv, t_shell *shell)
 		fullpath = ft_strjoin_free(tmp, argv, 1);
 		if (access(fullpath, X_OK) == 0)
 		{
-			free_split(paths, 0);
+			free_split(paths);
 			return (fullpath);
 		}
 		free(fullpath);
 	}
-	free_split(paths, 0);
+	free_split(paths);
 	return (NULL);
 }
 
@@ -92,7 +92,7 @@ void	verify_path(char **envp, char *path, t_tree *tree)
 void	free_exec_resources(char **envp, char *path)
 {
 	if (envp)
-		free_split(envp, 0);
+		free_split(envp);
 	if (path)
 		free(path);
 }

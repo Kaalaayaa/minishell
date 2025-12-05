@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 15:23:35 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/12 15:34:04 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/12/05 20:10:53 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,4 +58,14 @@ char	**check_path(char *argv, t_shell *shell)
 		return (NULL);
 	paths = ft_split(path_env, ':');
 	return (paths);
+}
+
+void	close_fd_in_range(int a, int b)
+{
+	a++;
+	while (a < b)
+	{
+		close(a);
+		a++;
+	}
 }

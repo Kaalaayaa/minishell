@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 15:23:35 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/12 15:34:04 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/12/05 20:03:49 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,28 +17,12 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 	int		fd[2];
 	pid_t	left_pid;
 	pid_t	right_pid;
-	int		status;
 
-	if (!tree || !shell)
+	if (pipe_init_and_left_fork(tree, shell, fd, &left_pid))
 		return ;
-	shell->in_pipe = true;
-	if (pipe(fd) == -1)
+	if (pipe_right_fork(shell, fd, left_pid, &right_pid))
 		return ;
-	left_pid = fork();
-	if (left_pid == 0)
-		pipe_end(fd, 0, tree, shell);
-	right_pid = fork();
-	if (right_pid == 0)
-		pipe_end(fd, 1, tree, shell);
-	close(fd[0]);
-	close(fd[1]);
-	waitpid(left_pid, NULL, 0);
-	waitpid(right_pid, &status, 0);
-	if (WIFEXITED(status))
-		shell->exit_status = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-		shell->exit_status = 128 + WTERMSIG(status);
-	shell->in_pipe = false;
+	pipe_cleanup_and_status(shell, fd, left_pid, right_pid);
 }
 
 void	execute_foreign(char **envp, char *path, t_tree *tree)
@@ -52,11 +36,15 @@ void	execute_foreign(char **envp, char *path, t_tree *tree)
 	execve(execpath, tree->argv, envp);
 	free_exec_resources(envp, path);
 	if (errno == EACCES)
-		print_and_exit("minishell: ", tree->argv[0], ": Permission denied\n",
-			126);
+	{
+		print_and_exit("minishell: ", tree->argv[0],
+			": Permission denied\n", 126);
+	}
 	else if (errno == ENOENT)
+	{
 		print_and_exit("minishell: ", tree->argv[0],
 			": No such file or directory\n", 127);
+	}
 	print_error("minishell: ", tree->argv[0], ": ");
 	print_error(strerror(errno), "\n", NULL);
 	exit(127);
@@ -64,27 +52,14 @@ void	execute_foreign(char **envp, char *path, t_tree *tree)
 
 void	exec_cmd(t_tree *tree, t_shell *shell)
 {
-	pid_t	pid;
-	int		status;
 	char	**envp;
 	char	*path;
 
-	if (!tree || !tree->argv || !tree->argv[0])
+	if (exec_cmd_prechecks(tree, shell))
 		return ;
-	if (handle_var_assignment(tree, shell))
+	if (exec_cmd_setup(tree, shell, &envp, &path))
 		return ;
-	if (run_parent_builtin(tree, shell))
-		return ;
-	envp = get_envp(shell->env_list);
-	path = get_path(tree->argv[0], shell);
-	if (check_path_unset(tree, shell, envp, path))
-		return ;
-	pid = fork();
-	if (pid == 0)
-		child_exec(tree, shell, envp, path);
-	waitpid(pid, &status, 0);
-	free_exec_resources(envp, path);
-	update_exit_status(status, shell);
+	exec_cmd_fork_exec(tree, shell, envp, path);
 }
 
 void	exec_with_redir(t_tree *tree, t_shell *shell)

@@ -30,7 +30,10 @@ int	redir_allocation(t_redir *redirections, t_shell *shell)
 			return (0);
 	}
 	else if (redirections->type == REDIR_HEREDOC)
-		write_lines(redirections->filename);
+	{
+		if (!write_lines(redirections->filename))
+			return (0);
+	}
 	return (1);
 }
 
@@ -52,7 +55,7 @@ char	**get_envp(t_env *env)
 		ret[i] = env_join(tmp->key, tmp->value);
 		if (!ret[i])
 		{
-			free_split(ret, --i);
+			free_split(ret);
 			return (NULL);
 		}
 		i++;
@@ -74,6 +77,8 @@ int	run_parent_builtin(t_tree *tree, t_shell *shell)
 
 void	child_exec(t_tree *tree, t_shell *shell, char **envp, char *path)
 {
+	close_fd_in_range(2, 1024);
+	setup_signals_child();
 	if (is_builtin(tree->argv[0]))
 	{
 		execute_builtin(tree->argv, shell);

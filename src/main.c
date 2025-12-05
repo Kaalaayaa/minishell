@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 15:19:27 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/19 19:02:39 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/12/05 20:04:52 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ static void	check_signal(t_shell *shell)
 static void	process_command(char *line, t_shell *shell)
 {
 	t_token	*tokens;
-	t_tree	*root;
 
 	if (line[0] != '\0')
 		add_history(line);
@@ -32,15 +31,16 @@ static void	process_command(char *line, t_shell *shell)
 	tokens = lexer(line);
 	tokens = expander(tokens, shell);
 	tokens = syntax(tokens, shell);
-	root = parse_e(&tokens, shell);
+	shell->tokens = tokens;
+	shell->tree = parse_e(&tokens, shell);
 	if (g_signal_status == 1)
 	{
 		check_signal(shell);
-		cleanup(tokens, root, NULL);
+		cleanup(tokens, shell->tree, NULL);
 		return ;
 	}
-	exec_tree(root, shell);
-	cleanup(tokens, root, NULL);
+	exec_tree(shell->tree, shell);
+	cleanup(tokens, shell->tree, NULL);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -59,6 +59,7 @@ int	main(int argc, char **argv, char **envp)
 		if (!line)
 		{
 			cleanup(NULL, NULL, &shell);
+			close_fd_in_range(2, 1024);
 			printf("exit\n");
 			break ;
 		}

@@ -57,13 +57,27 @@ int	get_exit_status(const char *str)
 	return ((result * sign) % 256);
 }
 
+void	invalid_nbr_exit(char **argv, t_shell *shell)
+{
+	printf("exit\n");
+	print_error("minishell: exit: ", argv[1],
+		": numeric argument required\n");
+	close_fd_in_range(3, 1024);
+	cleanup(shell->tokens, shell->tree, shell);
+	exit(2);
+}
+
 int	builtin_exit(char **argv, t_shell *shell)
 {
 	int	exit_status;
 
 	exit_status = shell->exit_status;
 	if (!argv[1])
+	{
+		close_fd_in_range(2, 1024);
+		cleanup(shell->tokens, shell->tree, shell);
 		exit(exit_status);
+	}
 	if (argv[2])
 	{
 		printf("exit\n");
@@ -71,13 +85,10 @@ int	builtin_exit(char **argv, t_shell *shell)
 		return (1);
 	}
 	if (!is_valid_exit_nbr(argv[1]))
-	{
-		printf("exit\n");
-		print_error("minishell: exit: ", argv[1],
-			": numeric argument required\n");
-		exit(2);
-	}
+		invalid_nbr_exit(argv, shell);
 	exit_status = get_exit_status(argv[1]);
 	printf("exit\n");
+	close_fd_in_range(3, 1024);
+	cleanup(shell->tokens, shell->tree, shell);
 	exit(exit_status);
 }
