@@ -179,7 +179,7 @@ void			check_slash_path(char **envp, char *path, t_tree *tree);
 void			check_normal_path(char **envp, char *path, t_tree *tree);
 void			free_exec_resources(char **envp, char *path);
 void			verify_path(char **envp, char *path, t_tree *tree);
-void			write_lines(char *argv);
+int				write_lines(char *argv);
 void			update_exit_status(int status, t_shell *shell);
 void			handle_pipe_status(int status, t_shell *shell);
 void			handle_cmd_signal(int status, t_shell *shell);

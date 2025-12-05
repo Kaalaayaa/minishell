@@ -30,7 +30,10 @@ int	redir_allocation(t_redir *redirections, t_shell *shell)
 			return (0);
 	}
 	else if (redirections->type == REDIR_HEREDOC)
-		write_lines(redirections->filename);
+	{
+		if (!write_lines(redirections->filename))
+			return (0);
+	}
 	return (1);
 }
 

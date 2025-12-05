@@ -36,6 +36,7 @@ void	exec_pipe(t_tree *tree, t_shell *shell)
 	{
 		close(fd[0]);
 		close(fd[1]);
+		waitpid(left_pid, NULL, 0);
 		return ;
 	}
 	if (right_pid == 0)
@@ -88,7 +89,10 @@ void	exec_cmd(t_tree *tree, t_shell *shell)
 		setup_signals_parent();
 	pid = fork();
 	if (pid == -1)
-		return ; // check later;
+	{
+		free_exec_resources(envp, path);
+		return ;
+	}
 	if (pid == 0)
 		child_exec(tree, shell, envp, path);
 	waitpid(pid, &status, 0);

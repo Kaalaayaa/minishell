@@ -64,7 +64,10 @@ static void	heredoc_child(t_shell *shell, const char *file, int fdw)
 	setup_signals_heredoc();
 	new = heredoc_collect(shell, file);
 	if (new)
+	{
 		write(fdw, new, ft_strlen(new));
+		free(new);
+	}
 	close(fdw);
 	exit(0);
 }
@@ -87,8 +90,10 @@ static char	*heredoc_parent(int fd_read, pid_t pid, t_shell *shell)
 	else if (WIFSIGNALED(status))
 		shell->exit_status = 128 + WTERMSIG(status);
 	bytes = read(fd_read, buffer, sizeof(buffer) - 1);
-	buffer[bytes] = '\0';
 	close(fd_read);
+	if (bytes < 0)
+		return (NULL);
+	buffer[bytes] = '\0';
 	return (ft_strdup(buffer));
 }
 

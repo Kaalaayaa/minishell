@@ -12,23 +12,25 @@
 
 #include "../includes/minishell.h"
 
-void	write_lines(char *argv)
+int	write_lines(char *argv)
 {
-	int	fd[2];
+	int		fd[2];
 	pid_t	pid;
 
-	if (pipe(fd) == -1)
-		return ;
+	if (!argv || pipe(fd) == -1)
+		return (0);
 	pid = fork();
 	if (pid == -1)
 	{
 		close(fd[0]);
 		close(fd[1]);
-		return ;
+		return (0);
 	}
 	if (pid == 0)
 	{
 		close(fd[0]);
+		close_fd_in_range(2, fd[1]);
+		close_fd_in_range(fd[1], 1024);
 		write(fd[1], argv, ft_strlen(argv));
 		write(fd[1], "\n", 1);
 		close(fd[1]);
@@ -41,6 +43,7 @@ void	write_lines(char *argv)
 		close(fd[0]);
 		waitpid(pid, NULL, 0);
 	}
+	return (1);
 }
 
 void	update_exit_status(int status, t_shell *shell)
