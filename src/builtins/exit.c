@@ -62,7 +62,7 @@ void	invalid_nbr_exit(char **argv, t_shell *shell)
 	printf("exit\n");
 	print_error("minishell: exit: ", argv[1],
 		": numeric argument required\n");
-	close_fd_in_range(3, 1024);
+	close_fd_in_range(2, 1024);
 	cleanup(shell->tokens, shell->tree, shell);
 	exit(2);
 }
@@ -88,7 +88,7 @@ int	builtin_exit(char **argv, t_shell *shell)
 		invalid_nbr_exit(argv, shell);
 	exit_status = get_exit_status(argv[1]);
 	printf("exit\n");
-	close_fd_in_range(3, 1024);
+	close_fd_in_range(2, 1024);
 	cleanup(shell->tokens, shell->tree, shell);
 	exit(exit_status);
 }

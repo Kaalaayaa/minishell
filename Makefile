@@ -16,12 +16,14 @@ SRCS = src/main.c  src/lexer/lexing.c src/lexer/lexer_utils.c \
 	   src/execution/exec_utils2.c src/execution/exec_utils3.c src/execution/exec2.c src/execution/exec3.c \
 	   src/execution/exec_utils4.c src/execution/exec_utils5.c
 
-
 # Object files
 OBJS = $(SRCS:.c=.o)
 
 LIBFT_DIR = libft
 LIBFT = $(LIBFT_DIR)/libft.a
+
+# Header files
+HEADERS = includes/minishell.h
 
 all: $(LIBFT) $(NAME)
 
@@ -33,8 +35,8 @@ $(LIBFT):
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $^ -L$(LIBFT_DIR) -lft -lreadline -o $@
 
-# Compile source files to object files
-%.o: %.c
+# Compile source files to object files, make them depend on headers
+%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Clean rules
