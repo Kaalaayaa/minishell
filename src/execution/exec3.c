@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec3.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pdangwal <pdangwal@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/30 00:00:00 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/30 00:00:00 by pdangwal         ###   ########.fr       */
+/*   Updated: 2025/12/05 19:57:18 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,9 @@ void	handle_pipe_status(int status, t_shell *shell)
 	else if (WIFSIGNALED(status))
 	{
 		shell->exit_status = 128 + WTERMSIG(status);
-		if (WTERMSIG(status) == SIGQUIT)
+		if (WTERMSIG(status) == SIGINT)
+			write(1, "\n", 1);
+		else if (WTERMSIG(status) == SIGQUIT)
 			write(2, "Quit (core dumped)\n", 19);
 	}
 }

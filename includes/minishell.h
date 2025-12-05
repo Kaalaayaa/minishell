@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 09:34:36 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/19 19:29:47 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/12/05 20:07:20 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,7 @@ void			shell_init(t_shell *shell, char **envp);
 int				redir_allocation(t_redir *redir, t_shell *shell);
 char			*get_heredoc(char *file, t_shell *shell);
 void			delete_line(char **argv, int index);
+void			print_heredoc_error(char *line_number, const char *file);
 
 /* ************************** */
 /*          LEXER              */
@@ -131,6 +132,8 @@ t_token			*syntax(t_token *tokens, t_shell *shell);
 
 t_token			*expander(t_token *tokens, t_shell *shell);
 char			*expand_env(const char *s, t_shell *shell);
+char			*expand_env_inside_dquote(const char *str, t_shell *shell);
+size_t			handle_single_quote(const char *str, size_t i, char **res);
 char			*extract_env_key(char *s);
 void			append_and_free(char **res, const char *add);
 void			append_env_value(char **res, char *value);
@@ -197,6 +200,17 @@ int				handle_var_assignment(t_tree *tree, t_shell *shell);
 int				check_path_unset(t_tree *tree, t_shell *shell, char **envp,
 					char *path);
 void			close_fd_in_range(int a, int b);
+int				pipe_init_and_left_fork(t_tree *tree, t_shell *shell,
+					int fd[2], pid_t *left_pid);
+int				pipe_right_fork(t_shell *shell, int fd[2],
+					pid_t left_pid, pid_t *right_pid);
+void			pipe_cleanup_and_status(t_shell *shell,
+					int fd[2], pid_t left_pid, pid_t right_pid);
+int				exec_cmd_prechecks(t_tree *tree, t_shell *shell);
+int				exec_cmd_setup(t_tree *tree, t_shell *shell,
+					char ***envp, char **path);
+void			exec_cmd_fork_exec(t_tree *tree, t_shell *shell,
+					char **envp, char *path);
 
 /* ************************** */
 /*          SIGNALS             */

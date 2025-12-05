@@ -6,7 +6,7 @@
 /*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 15:19:27 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/19 19:02:39 by kchatela         ###   ########.fr       */
+/*   Updated: 2025/12/05 20:04:52 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ static void	check_signal(t_shell *shell)
 static void	process_command(char *line, t_shell *shell)
 {
 	t_token	*tokens;
-//	t_tree	*root;
 
 	if (line[0] != '\0')
 		add_history(line);
@@ -70,5 +69,3 @@ int	main(int argc, char **argv, char **envp)
 	rl_clear_history();
 	return (0);
 }
-
-// valgrind --suppressions=suppressions.supp --track-fds=yes --show-leak-kinds=all ./minishell

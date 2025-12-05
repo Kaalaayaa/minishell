@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils3.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pdangwal <pdangwal@student.42berlin.d      +#+  +:+       +#+        */
+/*   By: kchatela <kchatela@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 19:28:32 by pdangwal          #+#    #+#             */
-/*   Updated: 2025/11/20 19:28:33 by pdangwal         ###   ########.fr       */
+/*   Updated: 2025/12/05 20:11:02 by kchatela         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int	write_lines(char *argv)
 
 	if (!argv || pipe(fd) == -1)
 		return (0);
-	return write_lines_fork(argv, fd);
+	return (write_lines_fork(argv, fd));
 }
 
 void	update_exit_status(int status, t_shell *shell)
@@ -63,43 +63,4 @@ void	update_exit_status(int status, t_shell *shell)
 		shell->exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
 		shell->exit_status = 128 + WTERMSIG(status);
-}
-
-void	print_and_exit(char *s1, char *s2, char *s3, int exitcode)
-{
-	print_error(s1, s2, s3);
-	exit(exitcode);
-}
-
-int	env_count(t_env *env)
-{
-	int		count;
-	t_env	*tmp;
-
-	count = 0;
-	tmp = env;
-	while (tmp)
-	{
-		count++;
-		tmp = tmp->next;
-	}
-	return (count);
-}
-
-char	*env_join(char *key, char *value)
-{
-	char	*str;
-	int		len_k;
-	int		len_v;
-
-	len_k = ft_strlen(key);
-	len_v = ft_strlen(value);
-	str = malloc(len_k + len_v + 2);
-	if (!str)
-		return (NULL);
-	ft_memcpy(str, key, len_k);
-	str[len_k] = '=';
-	ft_memcpy(str + len_k + 1, value, len_v);
-	str[len_k + len_v + 1] = '\0';
-	return (str);
 }
