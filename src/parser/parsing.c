@@ -41,19 +41,22 @@ char	**parse_simple_command(t_token **tokens)
 	char	**argv;
 	int		i;
 	int		count;
+	t_token	*tmp;
 
 	count = 0;
-	t_token	*tmp = *tokens;
+	tmp = *tokens;
 	while (tmp && tmp->type == WORD)
 	{
-		count++;
+		if (ft_strcmp(tmp->token, "$EMPTY") != 0)
+			count++;
 		tmp = tmp->next;
 	}
 	argv = malloc(sizeof(char *) * (count + 1));
 	i = 0;
 	while (*tokens && (*tokens)->type == WORD)
 	{
-		argv[i++] = ft_strdup((*tokens)->token);
+		if (ft_strcmp((*tokens)->token, "$EMPTY") != 0)
+			argv[i++] = ft_strdup((*tokens)->token);
 		*tokens = (*tokens)->next;
 	}
 	argv[i] = NULL;

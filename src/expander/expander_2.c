@@ -114,7 +114,7 @@ static size_t	process_expand_char(const char *str, size_t i, t_shell *shell,
 	else if (str[i] == '\'')
 		return (handle_single_quote(str, i, res));
 	else if (str[i] == '$' && !str[i + 1])
-		return (handle_single_sign(str[i], res));
+		return (handle_single_sign(i, res));
 	else if (str[i] == '$')
 		return (handle_env(str, i, shell, res));
 	else
